@@ -73,7 +73,7 @@ class PersonAuthentication(PersonAuthenticationType):
 
             print "Get Attribute is going to be called!!!"
 
-            user_mail = find_user_by_uid.getAttribute("mail", False)
+            user_mail = find_user_by_uid.getAttribute("mail", False)        ## Here we are trying to get mail  
 
             if (user_mail == None):
                 print "Failed to get Mail"
