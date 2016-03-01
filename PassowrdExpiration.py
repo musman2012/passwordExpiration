@@ -75,19 +75,19 @@ class PersonAuthentication(PersonAuthenticationType):
 
             print "Get Attribute is going to be called!!!!123!"
 
-            user_mail = find_user_by_uid.getAttribute("displayName", False)
+            user_dispName = find_user_by_uid.getAttribute("displayName", False)
 
-            if (user_mail == None):
+            if (user_dispName == None):
                 print "Failed to get Mail"
                 return False
  
-            print "Mail is : '" + user_mail + "' ."
+            print "Mail is : '" + user_dispName + "' ."
 
             find_user_by_uid.setAttribute("oxPasswordExpirationDate", "20160213195000Z")
 
 	    user_expDate = find_user_by_uid.getAttribute("oxPasswordExpirationDate", False)
 	    
-	    if (user_mail == None):
+	    if (user_expDate == None):
                 print "Failed to get Date"
                 return False
  
