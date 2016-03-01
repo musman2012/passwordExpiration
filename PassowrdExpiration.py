@@ -3,6 +3,8 @@ from org.xdi.model.custom.script.type.auth import PersonAuthenticationType
 from org.xdi.oxauth.service import UserService
 from org.xdi.util import StringHelper
 from org.xdi.util import ArrayHelper
+import java.util.Calendar;
+
 
 import java
 
@@ -71,9 +73,9 @@ class PersonAuthentication(PersonAuthenticationType):
                 print "Basic (with password update). Authenticate for step 2. Failed to find user"
                 return False
 
-            print "Get Attribute is going to be called!!!"
+            print "Get Attribute is going to be called!!!!123!"
 
-            user_mail = find_user_by_uid.getAttribute("mail", False)        ## Here we are trying to get mail  
+            user_mail = find_user_by_uid.getAttribute("displayName", False)
 
             if (user_mail == None):
                 print "Failed to get Mail"
@@ -81,7 +83,17 @@ class PersonAuthentication(PersonAuthenticationType):
  
             print "Mail is : '" + user_mail + "' ."
 
-            find_user_by_uid.setAttribute("userPassword", new_password)
+            find_user_by_uid.setAttribute("oxPasswordExpirationDate", "20160213195000Z")
+
+	    user_expDate = find_user_by_uid.getAttribute("oxPasswordExpirationDate", False)
+	    
+	    if (user_mail == None):
+                print "Failed to get Date"
+                return False
+ 
+            print "Exp Date is : '" + user_expDate + "' ."
+
+
             userService.updateUser(find_user_by_uid)
             print "Basic (with password update). Authenticate for step 2. Password updated successfully"
 
