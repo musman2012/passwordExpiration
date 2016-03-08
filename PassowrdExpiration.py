@@ -3,8 +3,7 @@ from org.xdi.model.custom.script.type.auth import PersonAuthenticationType
 from org.xdi.oxauth.service import UserService
 from org.xdi.util import StringHelper
 from org.xdi.util import ArrayHelper
-import java.util.Calendar;
-
+import java.util.Calendar
 
 import java
 
@@ -85,14 +84,19 @@ class PersonAuthentication(PersonAuthenticationType):
 
             find_user_by_uid.setAttribute("oxPasswordExpirationDate", "20160213195000Z")
 
-	    user_expDate = find_user_by_uid.getAttribute("oxPasswordExpirationDate", False)
-	    
-	    if (user_expDate == None):
-                print "Failed to get Date"
-                return False
- 
+            user_expDate = find_user_by_uid.getAttribute("oxPasswordExpirationDate", False)
+
+            if (user_expDate == None):
+                    print "Failed to get Date"
+                    return False
+
             print "Exp Date is : '" + user_expDate + "' ."
 
+            myDate = GluuDate(user_expDate)
+
+            expYear = myDate.getYear()
+
+            print "Year of password expiration is" + expYear
 
             userService.updateUser(find_user_by_uid)
             print "Basic (with password update). Authenticate for step 2. Password updated successfully"
@@ -125,3 +129,22 @@ class PersonAuthentication(PersonAuthenticationType):
 
     def logout(self, configurationAttributes, requestParameters):
         return True
+
+class GluuDate:
+    def __init__(self, LDAPDate):
+        self.LDAPDate = LDAPDate
+
+    def getYear(self):
+        year = self.LDAPDate[0:4]
+        return year
+
+    def getMonth(self):
+        month = self.LDAPDate[4:6]
+        return month
+
+    def getDate(self):
+        date = self.LDAPDate[6:8]
+        return date
+
+
+
