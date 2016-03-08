@@ -3,7 +3,7 @@ from org.xdi.model.custom.script.type.auth import PersonAuthenticationType
 from org.xdi.oxauth.service import UserService
 from org.xdi.util import StringHelper
 from org.xdi.util import ArrayHelper
-import java.util.Calendar
+
 
 import java
 
@@ -96,7 +96,11 @@ class PersonAuthentication(PersonAuthenticationType):
 
             expYear = myDate.getYear()
 
-            print "Year of password expiration is" + expYear
+            expMonth = myDate.getMonth()
+
+            expDate = myDate.getDate()
+
+            print ("Year of password expiration is " + expYear + " Month of password expiration is " + expMonth + " Date of password expiration is " + expDate)
 
             userService.updateUser(find_user_by_uid)
             print "Basic (with password update). Authenticate for step 2. Password updated successfully"
@@ -145,6 +149,4 @@ class GluuDate:
     def getDate(self):
         date = self.LDAPDate[6:8]
         return date
-
-
 
