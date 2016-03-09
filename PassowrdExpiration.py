@@ -14,7 +14,7 @@ class PersonAuthentication(PersonAuthenticationType):
     def init(self, configurationAttributes):
         print "Basic (with password update). Initialization"
         print "Basic (with password update). Initialized successfully"
-        return True   
+        return True
 
     def destroy(self, configurationAttributes):
         print "Basic (with password update). Destroy"
@@ -23,6 +23,16 @@ class PersonAuthentication(PersonAuthenticationType):
 
     def getApiVersion(self):
         return 1
+
+    def parseDate(self, LDAPDate):
+        list = []
+        year = self.LDAPDate[0:4]
+        month = self.LDAPDate[4:6]
+        date = self.LDAPDate[6:8]
+        list.append(year)
+        list.append(month)
+        list.append(date)
+        return list
 
     def isValidAuthenticationMethod(self, usageType, configurationAttributes):
         return True
@@ -67,7 +77,7 @@ class PersonAuthentication(PersonAuthenticationType):
             print "Basic (with password update). Authenticate for step 2. Attemprin to set new user '" + user_name + "' password"
 
             find_user_by_uid = userService.getUser(user_name)
-           
+
             if (find_user_by_uid == None):
                 print "Basic (with password update). Authenticate for step 2. Failed to find user"
                 return False
@@ -79,7 +89,7 @@ class PersonAuthentication(PersonAuthenticationType):
             if (user_dispName == None):
                 print "Failed to get Mail"
                 return False
- 
+
             print "Mail is : '" + user_dispName + "' ."
 
             find_user_by_uid.setAttribute("oxPasswordExpirationDate", "20160213195000Z")
@@ -92,15 +102,15 @@ class PersonAuthentication(PersonAuthenticationType):
 
             print "Exp Date is : '" + user_expDate + "' ."
 
-            myDate = GluuDate(user_expDate)
+            myDate = self.parseDate(user_expDate)
 
-            expYear = myDate.getYear()
+            expYear = myDate[0]
 
-            expMonth = myDate.getMonth()
+            expMonth = myDate[1]
 
-            expDate = myDate.getDate()
+            expDate = myDate[2]
 
-            print ("Year of password expiration is " + expYear + " Month of password expiration is " + expMonth + " Date of password expiration is " + expDate)
+            print ('Year of password expiration is ' + expYear + ' Month of password expiration is ' + expMonth + ' Date of password expiration is ' + expDate)
 
             userService.updateUser(find_user_by_uid)
             print "Basic (with password update). Authenticate for step 2. Password updated successfully"
@@ -134,19 +144,4 @@ class PersonAuthentication(PersonAuthenticationType):
     def logout(self, configurationAttributes, requestParameters):
         return True
 
-class GluuDate:
-    def __init__(self, LDAPDate):
-        self.LDAPDate = LDAPDate
-
-    def getYear(self):
-        year = self.LDAPDate[0:4]
-        return year
-
-    def getMonth(self):
-        month = self.LDAPDate[4:6]
-        return month
-
-    def getDate(self):
-        date = self.LDAPDate[6:8]
-        return date
 
