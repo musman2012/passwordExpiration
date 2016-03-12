@@ -26,12 +26,9 @@ class PersonAuthentication(PersonAuthenticationType):
 
     def parseDate(self, LDAPDate):
         list = []
-        year = self.LDAPDate[0:4]
-        month = self.LDAPDate[4:6]
-        date = self.LDAPDate[6:8]
-        list.append(year)
-        list.append(month)
-        list.append(date)
+        list.append(LDAPDate[0:4])
+        for index in range (4,( len(LDAPDate) )-1,2):
+            list.append(LDAPDate[index:index+2])
         return list
 
     def isValidAuthenticationMethod(self, usageType, configurationAttributes):
@@ -74,7 +71,7 @@ class PersonAuthentication(PersonAuthenticationType):
 
             new_password = new_password_array[0]
 
-            print "Basic (with password update). Authenticate for step 2. Attemprin to set new user '" + user_name + "' password"
+            print "Basic (with password update). Authenticate for step 2. Attempting to set new user '" + user_name + "' password"
 
             find_user_by_uid = userService.getUser(user_name)
 
@@ -104,13 +101,10 @@ class PersonAuthentication(PersonAuthenticationType):
 
             myDate = self.parseDate(user_expDate)
 
-            expYear = myDate[0]
-
-            expMonth = myDate[1]
-
-            expDate = myDate[2]
-
-            print ('Year of password expiration is ' + expYear + ' Month of password expiration is ' + expMonth + ' Date of password expiration is ' + expDate)
+            print (myDate)
+            
+            print ("Year of password expiration is " + myDate[0] + " Month is " + myDate[2] + " Date is " + myDate[3])
+            print(" hour = " + myDate[3] + " Mins = " + myDate[4] + " secs = " + myDate[5])
 
             userService.updateUser(find_user_by_uid)
             print "Basic (with password update). Authenticate for step 2. Password updated successfully"
