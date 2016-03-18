@@ -4,7 +4,7 @@ from org.xdi.oxauth.service import UserService
 from org.xdi.util import StringHelper
 from org.xdi.util import ArrayHelper
 
-
+import datetime
 import java
 
 class PersonAuthentication(PersonAuthenticationType):
@@ -37,6 +37,41 @@ class PersonAuthentication(PersonAuthenticationType):
     def getAlternativeAuthenticationMethod(self, usageType, configurationAttributes):
         return None
 
+    def newExpirationDate(self, date_time):
+        year = date_time[0]
+        date_time[0] = year[2:]
+        
+        startDate = ""
+        print("Hello World!!!")
+        index = 0
+        for index in range(0,2):
+            startDate += date_time[index]
+            startDate += "-"
+        index += 1
+        startDate = startDate + date_time[index]
+        print(startDate + "Testing 0")
+        date_1 = datetime.datetime.strptime(startDate, "%y-%m-%d")
+        print date_1
+        expDate = date_1 + datetime.timedelta(days=20)
+        print expDate
+
+        return expDate
+
+    def previousExpDate(self, dateList):
+        year = dateList[0]
+        dateList[0] = year[2:]
+        print (dateList[0]+'sssssss')
+        startDate = ""
+        print("Hello World!!!")
+        index = 0
+        for index in range(0,2):
+            startDate += dateList[index]
+            startDate += "-"
+        index += 1
+        startDate = startDate + dateList[index]
+        print(startDate + "Testing 0")
+        return datetime.datetime.strptime(startDate, "%y-%m-%d")
+
     def authenticate(self, configurationAttributes, requestParameters, step):
         credentials = Identity.instance().getCredentials()
         user_name = credentials.getUsername()
@@ -56,40 +91,14 @@ class PersonAuthentication(PersonAuthenticationType):
 
             return True
         elif (step == 2):
-            print "Basic (with password update). Authenticate for step 2"
 
             userService = UserService.instance()
-
-            update_button = requestParameters.get("loginForm:updateButton")
-            if ArrayHelper.isEmpty(update_button):
-                return True
-
-            new_password_array = requestParameters.get("new_password")
-            if ArrayHelper.isEmpty(new_password_array) or StringHelper.isEmpty(new_password_array[0]):
-                print "Basic (with password update). Authenticate for step 2. New password is empty"
-                return False
-
-            new_password = new_password_array[0]
-
-            print "Basic (with password update). Authenticate for step 2. Attempting to set new user '" + user_name + "' password"
 
             find_user_by_uid = userService.getUser(user_name)
 
             if (find_user_by_uid == None):
                 print "Basic (with password update). Authenticate for step 2. Failed to find user"
                 return False
-
-            print "Get Attribute is going to be called!!!!123!"
-
-            user_dispName = find_user_by_uid.getAttribute("displayName", False)
-
-            if (user_dispName == None):
-                print "Failed to get Mail"
-                return False
-
-            print "Mail is : '" + user_dispName + "' ."
-
-            find_user_by_uid.setAttribute("oxPasswordExpirationDate", "20160213195000Z")
 
             user_expDate = find_user_by_uid.getAttribute("oxPasswordExpirationDate", False)
 
@@ -99,17 +108,41 @@ class PersonAuthentication(PersonAuthenticationType):
 
             print "Exp Date is : '" + user_expDate + "' ."
 
+            now = datetime.datetime.now()
+
             myDate = self.parseDate(user_expDate)
 
-            print (myDate)
-            
-            print ("Year of password expiration is " + myDate[0] + " Month is " + myDate[2] + " Date is " + myDate[3])
-            print(" hour = " + myDate[3] + " Mins = " + myDate[4] + " secs = " + myDate[5])
+            prevExpDate = self.previousExpDate(myDate)
 
-            userService.updateUser(find_user_by_uid)
-            print "Basic (with password update). Authenticate for step 2. Password updated successfully"
+            expDate = self.newExpirationDate(myDate)
 
-            return True
+            temp = expDate.strftime("%y%m%d")
+
+            expDate = (expDate + temp + "195000Z")
+
+            if prevExpDate < now:
+                print "Basic (with password update). Authenticate for step 2"
+
+                find_user_by_uid.setAttribute("oxPasswordExpirationDate", expDate)
+
+                update_button = requestParameters.get("loginForm:updateButton")
+                if ArrayHelper.isEmpty(update_button):
+                    return True
+
+                new_password_array = requestParameters.get("new_password")
+                if ArrayHelper.isEmpty(new_password_array) or StringHelper.isEmpty(new_password_array[0]):
+                    print "Basic (with password update). Authenticate for step 2. New password is empty"
+                    return False
+
+                new_password = new_password_array[0]
+
+                print "Basic (with password update). Authenticate for step 2. Attempting to set new user '" + user_name + "' password"
+
+
+                userService.updateUser(find_user_by_uid)
+                print "Basic (with password update). Authenticate for step 2. Password updated successfully"
+
+                return True
         else:
             return False
 
